@@ -8,8 +8,18 @@ public:
     void update();
     void draw();
 
-    ofPixels pixelesLaberintoAzul;
-    bool inicioJuego=false; //Variable para iniciar
-    bool juegoGanado = false; //Variable para terminar
+    void keyPressed(int key);
 
+    ofImage laberintoNivel1;
+    ofImage laberintoNivel2;
+    ofImage milei;
+
+
+    ofPixels pixelesLaberintoAzul;
+    ofPixels pixelesLaberintoRojo;
+
+    bool inicioJuego; //Variable para iniciar
+    bool juegoGanado; //Variable para terminar
+
+    bool pantalla_completa;
 };
