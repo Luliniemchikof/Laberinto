@@ -16,7 +16,7 @@ void ofApp::setup() {
 	milei.load("milei.jpg");
 	caratula.load("caratula.jpg");
 
-	inicioJuego = false;
+	inicioJuego = false; 
 	juegoGanado = false;
 	juegoPerdido = false;
 
@@ -44,11 +44,137 @@ void ofApp::draw() {
 
 	if (open) {
 		caratula.draw(0, 0, ofGetWidth(), ofGetHeight()); // Escala exacta a la ventana 
-		inicioJuego = false;
+		inicioJuego = false; //reitero los false para que, en caso de inicializarse el juego y perder, no quede ese modo
 		juegoGanado = false;
+		juegoPerdido = false;
+		ofShowCursor(); //vuelvo a mostrar el cursor
+	}
+	
+
+	//-------Nivel1----------------------------------------
+	if (nivel1) {
+		
+		ofPushMatrix();
+
+		ofScale(escalaX, escalaY);
+
+		ofSetColor(0);
+		ofDrawRectangle(0, 0, 660, 315); //1
+
+		ofDrawRectangle(0, 300, 90, 720);//2
+
+		ofDrawRectangle(90, 300, 40, 140);//3
+
+		ofDrawRectangle(0, 1020, 1840, 60); //4
+
+		ofDrawRectangle(1840, 70, 80, 1010); //5
+
+		ofDrawRectangle(660, 0, 1260, 70); //6
+
+		ofDrawRectangle(240, 300, 420, 140);//7
+
+		ofDrawRectangle(275, 440, 385, 415); //8
+
+		ofDrawRectangle(660, 680, 1015, 175); //9
+
+		ofDrawRectangle(1515, 200, 160, 480);//10
+
+		ofDrawRectangle(787, 200, 730, 107); //11
+
+		ofDrawRectangle(787, 300, 198, 260); //12
+
+		ofDrawRectangle(980, 495, 190, 65); //13
+
+		ofDrawRectangle(1167, 410, 253, 150); //14
+
+		ofDrawRectangle(1020, 365, 400, 65);//15
+
+		ofSetColor(255, 255, 0);
+		ofDrawRectangle(130, 315, 110, 125);
+
+		ofSetColor(255, 0, 0);
+		ofDrawRectangle(1145, 430, 120, 65);
+
+		ofPopMatrix(); //Cierre del escalado
+
+	}
+
+
+	// Verificamos si el mouse está sobre el rectángulo amarillo de inicio
+	if (!inicioJuego && nivel1) {
+		//defino una zona menor para que el juego no termine antes
+		if (mouseXVirtual >= 140 && mouseXVirtual <= 140 + 80 &&
+			mouseYVirtual >= 320 && mouseYVirtual <= 320 + 100) {
+			inicioJuego = true;
+			cout << "¡Juego iniciado!" << endl;
+		}
+	}
+
+	// Dibujo el cursor si el juego comenzó
+	if (inicioJuego && !juegoPerdido && nivel1) {
+		ofHideCursor();
+		ofSetColor(255, 0, 0);
+		ofSetRectMode(OF_RECTMODE_CENTER);
+		float size = 8;
+		float halfSize = size / 2.0;
+		
+
+
+		int x = ofGetMouseX();
+		int y = ofGetMouseY();
+
+		// Verificación de colisión solo si el juego inició y no se perdió
+		ofImage captura;
+		captura.grabScreen(0, 0, ofGetWidth(), ofGetHeight());
+		ofPixels pixeles = captura.getPixels();
+
+		ofColor c1 = pixeles.getColor(x - halfSize, y - halfSize);
+		ofColor c2 = pixeles.getColor(x + halfSize, y - halfSize);
+		ofColor c3 = pixeles.getColor(x - halfSize, y + halfSize);
+		ofColor c4 = pixeles.getColor(x + halfSize, y + halfSize);
+
+		ofColor negro = ofColor(0, 0, 0);
+		if (c1 == negro || c2 == negro || c3 == negro || c4 == negro) {
+			juegoPerdido = true;
+			cout << "¡Perdiste!" << endl;
+		}
+
+		ofDrawRectangle(ofGetMouseX(), ofGetMouseY(), size, size);
+	}
+	if (!juegoGanado && inicioJuego && nivel1) { //Busco posición del cuadrado rojo
+		float escalaX = (float)ofGetWidth() / 1920.0;
+		float escalaY = (float)ofGetHeight() / 1080.0;
+		float mouseXVirtual = ofGetMouseX() / escalaX;
+		float mouseYVirtual = ofGetMouseY() / escalaY;
+
+		//defino una zona menor para que el juego no termine antes
+		if (mouseXVirtual >= 1145 && mouseXVirtual <= 1145 + 120 &&
+			mouseYVirtual >= 430 && mouseYVirtual <= 430 + 65) {
+			juegoGanado = true;
+			cout << "¡Juego Ganado!" << endl;
+		}
+	}
+
+	ofSetRectMode(OF_RECTMODE_CORNER); // Restaurar modo
+
+	if (juegoPerdido && nivel1) {
+		ofSetColor(255); // Asegura color completo
+		inicioJuego = false;
+		open = true;
+		nivel1 = false;
 		juegoPerdido = false;
 		ofShowCursor();
 	}
+
+	if (juegoGanado && nivel1) {
+		inicioJuego = false;
+		nivel1 = false;
+		nivel2 = true;
+		juegoGanado = false;
+		ofShowCursor();
+	}
+
+	
 	if (nivel2) { //----------Nivel2--------------------
 		ofPushMatrix();
 
@@ -75,6 +201,7 @@ void ofApp::draw() {
 
 		ofSetColor(255, 0, 0);
 		ofDrawRectangle(880, 50, 161, 220);
+
 		ofPopMatrix(); //Cierre del escalado
 
 
@@ -152,130 +279,6 @@ void ofApp::draw() {
 		juegoGanado = false;
 		open = true;
 	}
-
-	//-------Nivel1----------------------------------------
-	if (nivel1) {
-		
-		ofPushMatrix();
-
-		ofScale(escalaX, escalaY);
-
-		ofSetColor(0);
-		ofDrawRectangle(0, 0, 660, 315); //1
-
-		ofDrawRectangle(0, 300, 90, 720);//2
-
-		ofDrawRectangle(90, 300, 40, 140);//3
-
-		ofDrawRectangle(0, 1020, 1840, 60); //4
-
-		ofDrawRectangle(1840, 70, 80, 1010); //5
-
-		ofDrawRectangle(660, 0, 1260, 70); //6
-
-		ofDrawRectangle(240, 300, 420, 140);//7
-
-		ofDrawRectangle(275, 440, 385, 415); //8
-
-		ofDrawRectangle(660, 680, 1015, 175); //9
-
-		ofDrawRectangle(1515, 200, 160, 480);//10
-
-		ofDrawRectangle(787, 200, 730, 107); //11
-
-		ofDrawRectangle(787, 300, 198, 260); //12
-
-		ofDrawRectangle(980, 495, 190, 65); //13
-
-		ofDrawRectangle(1167, 410, 253, 150); //14
-
-		ofDrawRectangle(1020, 365, 400, 65);//15
-
-		ofSetColor(255, 255, 0);
-		ofDrawRectangle(130, 315, 110, 125);
-
-		ofSetColor(255, 0, 0);
-		ofDrawRectangle(1145, 430, 120, 65);
-
-		ofPopMatrix(); //Cierre del escalado
-
-	}
-
-
-	// Verificamos si el mouse está sobre el rectángulo amarillo de inicio
-	if (!inicioJuego && nivel1) {
-		//defino una zona menor para que el juego no termine antes
-		if (mouseXVirtual >= 140 && mouseXVirtual <= 140 + 80 &&
-			mouseYVirtual >= 320 && mouseYVirtual <= 320 + 100) {
-			inicioJuego = true;
-			cout << "¡Juego iniciado!" << endl;
-		}
-	}
-
-	// Dibujo el cursor si el juego comenzó
-	if (inicioJuego && !juegoPerdido && nivel1) {
-		ofHideCursor();
-		ofSetColor(255, 0, 0);
-		ofSetRectMode(OF_RECTMODE_CENTER);
-		float size = 8;
-		float halfSize = size / 2.0;
-		ofDrawRectangle(ofGetMouseX(), ofGetMouseY(), size, size);
-
-
-		int x = ofGetMouseX();
-		int y = ofGetMouseY();
-
-		// Verificación de colisión solo si el juego inició y no se perdió
-		ofImage captura;
-		captura.grabScreen(0, 0, ofGetWidth(), ofGetHeight());
-		ofPixels pixeles = captura.getPixels();
-
-		ofColor c1 = pixeles.getColor(x - halfSize, y - halfSize);
-		ofColor c2 = pixeles.getColor(x + halfSize, y - halfSize);
-		ofColor c3 = pixeles.getColor(x - halfSize, y + halfSize);
-		ofColor c4 = pixeles.getColor(x + halfSize, y + halfSize);
-
-		ofColor negro = ofColor(0, 0, 0);
-		if (c1 == negro || c2 == negro || c3 == negro || c4 == negro) {
-			juegoPerdido = true;
-			cout << "¡Perdiste!" << endl;
-		}
-	}
-	if (!juegoGanado && inicioJuego && nivel1) { //Busco posición del cuadrado rojo
-		float escalaX = (float)ofGetWidth() / 1920.0;
-		float escalaY = (float)ofGetHeight() / 1080.0;
-		float mouseXVirtual = ofGetMouseX() / escalaX;
-		float mouseYVirtual = ofGetMouseY() / escalaY;
-
-		//defino una zona menor para que el juego no termine antes
-		if (mouseXVirtual >= 1145 && mouseXVirtual <= 1145 + 120 &&
-			mouseYVirtual >= 430 && mouseYVirtual <= 430 + 65) {
-			juegoGanado = true;
-			cout << "¡Juego Ganado!" << endl;
-		}
-	}
-
-	ofSetRectMode(OF_RECTMODE_CORNER); // Restaurar modo
-
-	if (juegoPerdido && nivel1) {
-		ofSetColor(255); // Asegura color completo
-		inicioJuego = false;
-		open = true;
-		nivel1 = false;
-		juegoPerdido = false;
-		ofShowCursor();
-	}
-
-	if (juegoGanado && nivel1) {
-		inicioJuego = false;
-		nivel1 = false;
-		nivel2 = true;
-		juegoGanado = false;
-		ofShowCursor();
-	}
-
-	
-
 
 
 

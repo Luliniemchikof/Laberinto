@@ -23,7 +23,7 @@ public:
     bool juegoGanado; //Variable para terminar
     bool juegoPerdido;//Variable para interrumpir
 
-    bool open;
+    bool open; //carátula del juego
     bool nivel1;
     bool nivel2;
     bool video;
