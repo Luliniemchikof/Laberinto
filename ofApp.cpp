@@ -12,6 +12,13 @@ void ofApp::setup() {
 
 	ofSetFullscreen(pantalla_completa);
 
+	//botón de inicio
+	ofPushMatrix();
+
+	button.set(750, 980, 450, 100);  
+	fuente.load("Poppins-Regular.ttf", 23); // tipografía
+
+
 
 	milei.load("milei.jpg");
 	caratula.load("caratula.jpg");
@@ -19,16 +26,24 @@ void ofApp::setup() {
 	inicioJuego = false; 
 	juegoGanado = false;
 	juegoPerdido = false;
+	pantallaGanada= false;
+
 
 	open = true;
 	nivel1 = false;
-	nivel2 = false;
+	//nivel2 = false;
 	video = false;
+	
+
+	//video
+	videoPlayer.load("video1finaljuego.mp4");
+	videoPlayer.setLoopState(OF_LOOP_NONE);
 }
 
 //--------------------------------------------------------------
 void ofApp::update() {
-
+	// Detectar si el mouse está encima del rectángulo
+	
 }
 
 //--------------------------------------------------------------
@@ -48,7 +63,29 @@ void ofApp::draw() {
 		juegoGanado = false;
 		juegoPerdido = false;
 		ofShowCursor(); //vuelvo a mostrar el cursor
+		//interacción con botón
+
+		ofSetColor(0); // negro normal
+		ofPushMatrix();
+
+		ofScale(escalaX, escalaY);
+		ofDrawRectangle(button);
+
+		// Mostrar texto
+		ofSetColor(255);
+		string texto = "Presione barra espaciadora";
+		ofRectangle textBounds = fuente.getStringBoundingBox(texto, 0, 0);
+
+		float textX = button.getX() + (button.getWidth() - textBounds.getWidth()) / 2;
+		float textY = button.getY() + (button.getHeight() + textBounds.getHeight()) / 2;
+
+		ofSetColor(255);
+		fuente.drawString(texto, textX, textY);
+
+		ofPopMatrix(); //Cierre del escalado
+	
 	}
+
 	
 
 	//-------Nivel1----------------------------------------
@@ -157,25 +194,42 @@ void ofApp::draw() {
 
 	ofSetRectMode(OF_RECTMODE_CORNER); // Restaurar modo
 
-	if (juegoPerdido && nivel1) {
-		ofSetColor(255); // Asegura color completo
-		inicioJuego = false;
-		open = true;
-		nivel1 = false;
-		juegoPerdido = false;
-		ofShowCursor();
-	}
-
 	if (juegoGanado && nivel1) {
 		inicioJuego = false;
 		nivel1 = false;
-		nivel2 = true;
-		juegoGanado = false;
+
+		// guardamos el tiempo y activamos el flag
+		tiempoVictoria = ofGetElapsedTimeMillis();
+		mostrarMilei = true;
+		juegoGanado = false; // reseteamos el flag de victoria, ya está procesado
+	}
+
+	// Mostrar la imagen de Milei unos segundos
+	if (mostrarMilei) {
+		ofSetColor(255);  // blanco (sin tinte)
+		milei.draw(0, 0, ofGetWidth(), ofGetHeight());
+
+		// si pasaron más de 3 segundos (3000 ms) → mostrar video
+		if (ofGetElapsedTimeMillis() - tiempoVictoria > 3000) {
+			mostrarMilei = false;
+			video = true;
+			videoPlayer.play();
+		}
+	}
+
+	// Mostrar video si corresponde
+	if (video) {
+		videoPlayer.update();
+		ofSetColor(255);  // blanco (sin tinte)
+		videoPlayer.draw(0, 0, ofGetWidth(), ofGetHeight());
 		ofShowCursor();
 	}
 
 	
-	if (nivel2) { //----------Nivel2--------------------
+
+
+	
+	/*f (nivel2) { //----------Nivel2--------------------
 		ofPushMatrix();
 
 		ofScale(escalaX, escalaY);
@@ -277,10 +331,12 @@ void ofApp::draw() {
 		inicioJuego = false;
 		nivel2 = false;
 		juegoGanado = false;
+		ofSetColor(255); // Asegura color completo
 		open = true;
+
 	}
 
-
+	*/
 
 
 
@@ -298,4 +354,7 @@ void ofApp::keyPressed(int key)
 		open = false;
 		nivel1 = true;
 	}
+}
+void ofApp::mouseMoved(int x, int y) {
+	
 }
